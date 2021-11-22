@@ -1,0 +1,24 @@
+main{
+    var float n1;
+    var float n2;
+    var bool b;
+    var bool c;
+    b := true;
+    c := false;
+    n1 := 0;
+    n2 := 0;
+    
+    if ((b && c)){
+        n1 := 5.123;
+        n2 := 6E5;
+        n2 := 43232.12E-24;
+    };
+    if ((b || c)){
+        n1 := 1;
+        n2 := 2;
+    };
+    do{
+        n1 := (n1 + 0.5);
+    }while((n1<n2));
+    print (n1);
+}

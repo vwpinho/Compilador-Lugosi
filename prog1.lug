@@ -1,0 +1,26 @@
+main{
+    var float n1;
+    var float n2;
+    var bool b1;
+    var float t;
+    var float t1;
+    var float ans;
+    n1 := 10;
+    n2 := 7;
+    b1 := false;
+    t := 0;
+    while((b1 == false)) do{
+        t := (t + (n1/n2));
+        print(t);
+        b1 := (t > 50); 
+    };
+    t1 := (n1 * n2);
+    ans := Menor_valor(t, t1);
+    print(ans);
+}
+function float Menor_valor (float arg1, float arg2){
+    if((arg1 < arg2)){
+        return arg1;
+    };
+    return arg2;
+}

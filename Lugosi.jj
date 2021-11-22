@@ -1,0 +1,572 @@
+PARSER_BEGIN(Lugosi)
+import java.io.*;
+import java.util.ArrayList;
+
+class ArvoreLugosi{
+  ArrayList<Vardecl> vardecls;
+  ArrayList<Comando> comandos;
+  ArrayList<Function> funcs;
+
+  ArvoreLugosi(ArrayList vardecls, ArrayList comandos, ArrayList funcs)
+  { 
+    this.vardecls = vardecls;
+    this.comandos = comandos;
+    this.funcs = funcs;
+  }
+}
+
+class Comando{}
+
+class Atrib extends Comando{
+  String id;
+  Exp exp;
+
+  Atrib (String id, Exp exp){
+    this.id = id;
+    this.exp = exp;
+  }
+  public String toString(){
+    return id + " = " + exp + ";";
+  }
+  
+
+}
+
+class FuncCall extends Comando{
+  String id;
+  ArrayList<Exp> exp;
+
+  FuncCall(String id, ArrayList exp){
+    this.id = id;
+    this.exp = exp;
+  }
+
+  public String toString(){
+
+    String out = id + "("; 
+    for(Exp e : exp){
+       out += "," + exp;
+    }
+    return out + ")";
+  }
+}
+
+class If extends Comando{
+  Exp exp;
+  ArrayList<Comando> comandos;
+
+  If (Exp exp, ArrayList comandos){
+    this.exp = exp;
+    this.comandos = comandos;
+  }
+  public String toString(){
+    String out = "if(";
+    out += exp + "){\n";
+    for(Comando c : comandos){
+      out += "\t\t\t" + c + "\n";
+    }
+    return out + "\t\t}";
+  }
+}
+
+class While extends Comando{
+  Exp exp;
+  ArrayList<Comando> comandos;
+
+  While (Exp exp, ArrayList comandos){
+    this.exp = exp;
+    this.comandos = comandos;
+  }
+  public String toString(){
+    String out = "while(";
+    out += exp + "){\n";
+    for(Comando c : comandos){
+      out += "\t\t\t" + c + "\n";
+    }
+    return out + "\t\t}";
+  }
+}
+
+class Do extends Comando{
+  Exp exp;
+  ArrayList<Comando> comandos;
+
+  Do (Exp exp, ArrayList comandos){
+    this.exp = exp;
+    this.comandos = comandos;
+  }
+  public String toString(){
+    String out = "do{\n";
+    for(Comando c : comandos){
+      out += "\t\t\t" + c + "\n";
+    }
+    out += "\t\t}";
+    out += "while(" + exp + ");";
+    return out;
+  }
+}
+
+class Return extends Comando{
+  Exp exp;
+  Return(Exp exp){
+    this.exp = exp;
+  }
+  public String toString(){
+    return "return " + exp + ";";
+  }
+}
+
+class Print extends Comando{
+  Exp exp;
+  Print(Exp exp){
+    this.exp = exp;
+  }
+  public String toString(){
+    return "System.out.println(" + exp + ");";
+  }
+}
+
+class Exp{}
+
+class ExpOp extends Exp{
+  Exp exp1;
+  Exp exp2;
+  String op;
+  ExpOp(Exp exp1, Exp exp2, String op){
+    this.exp1 = exp1;
+    this.exp2 = exp2;
+    this.op = op;
+  }
+  public String toString(){
+    String out = "" + exp1 +" " +  op + " " + exp2;
+    return out;
+  }
+}
+
+class ExpFator extends Exp{
+  Fator fat;
+  ExpFator(Fator fat){
+    this.fat = fat;
+  }
+  public String toString(){
+    return "" + fat;
+  }
+}
+
+class Fator{}
+
+class FatorId extends Fator{
+  String id;
+  FatorId(String id){
+    this.id = id;
+  }
+  public String toString(){
+    return id;
+  }
+}
+
+class FatorIdList extends Fator{
+  ArrayList<Exp> exps;
+  String id;
+  FatorIdList(ArrayList<Exp> exps, String id){
+    this.exps = exps;
+    this.id = id;
+  }
+  public String toString(){
+    String out = id + "(";
+    for(Exp e : exps){
+      if(e == exps.get(0)){
+        out += e;
+      } else{
+        out += "," + e;
+      }
+      
+    }
+    return out + ")";
+  }
+
+}
+
+class FatorNum extends Fator{
+  String num;
+  FatorNum(String num){
+    this.num = num;
+  }
+  public String toString(){
+    if(num.indexOf('.') == -1 && num.indexOf('E') == -1){
+      return num;
+    }
+    return num + "f";
+  }
+}
+
+
+
+class FatorBool extends Fator{
+  boolean b;
+  FatorBool(boolean b){
+    this.b = b;
+  } 
+  public String toString(){
+    return Boolean.toString(b);
+  }
+}
+
+
+class Vardecl{
+  String tipo;
+  String id;
+  Vardecl(String tipo, String id){
+    this.tipo = tipo;
+    this.id = id;
+  }
+  public String toString(){
+    if(tipo == "bool"){
+      return "boolean " + id + ";";
+    }
+    return tipo + " " + id + ";";
+  }
+}
+
+class Function{
+  String tipo;
+  String id;
+  ArrayList<Arg> listaArgs;
+  ArrayList<Vardecl> vardecls;
+  ArrayList<Comando> comandos;
+  Function(String tipo, 
+    String id, 
+    ArrayList<Arg> listaArgs,
+    ArrayList<Vardecl> vardecls,
+    ArrayList<Comando> comandos){
+      this.id = id;
+      this.tipo = tipo;
+      this.listaArgs = listaArgs;
+      this.vardecls = vardecls;
+      this.comandos = comandos;
+  }
+  public String toString(){
+    String out;
+    if(tipo == "bool"){
+      out = "public static " + tipo + "ean " + id + "(";
+    }else{
+      out = "public static " + tipo + " " + id + "(";
+    }
+    for(Arg a : listaArgs){
+      if(a == listaArgs.get(0)){
+        out += a;
+      } else{
+        out += ", " +  a;
+      }
+    }
+    out += "){\n";
+    for(Vardecl v : vardecls){
+      out += "\t\t" + v;
+    }
+    for(Comando c : comandos){
+      out += "\t\t" + c;
+    }
+    return out + "\n\t}";
+  }
+
+}
+
+class Arg{
+  String tipo;
+  String id;
+  Arg(String tipo, String id){
+    this.tipo = tipo;
+    this.id = id;
+  }
+  public String toString(){
+    if(tipo == "bool"){
+      return "boolean " + id;
+    }
+    return tipo + " " + id;
+  }
+}
+
+public class Lugosi {
+
+  public static void main(String args[]) throws ParseException,IOException {
+    
+    Lugosi parser = new Lugosi(new FileInputStream(args[0]));
+
+    ArvoreLugosi arvore = parser.Lugosi();
+
+    geraCodigo(arvore,args[0]);
+
+    return;
+
+  }
+
+  public static void geraCodigo(ArvoreLugosi prog, String arquivo) throws IOException{
+    ArrayList<Comando> comandos = prog.comandos;
+    ArrayList<Vardecl> vardecls = prog.vardecls;
+    ArrayList<Function> funcs = prog.funcs;
+    FileWriter fileWriter = new FileWriter(arquivo.substring(0,arquivo.length()-4)+".java");
+    PrintWriter printWriter = new PrintWriter(fileWriter);
+    // printWriter.println("Some String");
+    // printWriter.printf("Product name is %s and its price is %d $", "iPhone", 1000);
+    
+    
+    printWriter.println("public class " + arquivo.substring(0,arquivo.length()-4) + "{");
+    printWriter.println("\tpublic static void main(String[] args){");
+    
+    
+    if(vardecls != null){
+      for(Vardecl v : vardecls){
+        printWriter.println("\t\t"+v);
+      }
+    }
+    if(comandos != null){
+      for(Comando c : comandos){
+        printWriter.println("\t\t"+c);
+      }
+    }
+    printWriter.println("\t}");
+    if (funcs != null){
+
+      for(Function f : funcs){
+        printWriter.println("\t"+f);
+      }
+    }
+    printWriter.println("}");
+    printWriter.close();
+  }
+}
+
+PARSER_END(Lugosi)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+  <MAIN: "main">
+| <ACHAVES: "{">
+| <FCHAVES: "}">
+| <PONV: ";">
+| <VAR: "var">
+| <INT: "int">
+| <BOOL: "bool">
+| <FLOAT: "float">
+| <VOID: "void"> 
+| <ATT: ":=">
+| <IF: "if">
+| <WHILE: "while">
+| <DO: "do">
+| <RET: "return">
+| <PRINT: "print"> 
+| <MAIS: "+">
+| <MENOS: "-">
+| <VEZES: "*">
+| <DIV: "/">
+| <AND: "&&">
+| <OU: "||">
+| <MENOR: "<">
+| <MAIOR: ">">
+| <IGUAL: "==">
+| <TRUE: "true">
+| <FALSE: "false">
+| <APAR: "(">
+| <FPAR: ")">
+| <FUNC: "function">
+| <VIR: ",">
+}
+
+TOKEN :
+{
+  <NUM : (["0"-"9"])+ ("." (["0"-"9"])+)? ("E" (["+","-"])? (["0"-"9"])+)?>
+| <ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"])* ("_" (["a"-"z", "A"-"Z", "0"-"9"])+)*>
+// | <OP: ("+"|"-"|"/"|"*"|">"|"<"|"&&"|("|" "|")| ("=" "="))> //("&" "&") ,("|" "|") , ("=" "=")]>
+// | <TIPO: "INT" | "FLOAT" | "BOOL" | "VOID">
+}
+
+
+
+ArvoreLugosi Lugosi () :
+{ArrayList<Comando> comandos = new ArrayList();
+  ArrayList<Vardecl> vardecls = new ArrayList();
+  ArrayList<Function> funcs = new ArrayList();}
+{
+ (<MAIN> <ACHAVES> Vardecl(vardecls) Comandos(comandos) <FCHAVES> Funcs(funcs)
+ <EOF>) 
+ {return new ArvoreLugosi(vardecls,comandos,funcs);}
+}
+
+void Vardecl(ArrayList vardecls):
+{Vardecl v;}
+{
+  ( <VAR> v=Vardec() {vardecls.add(v);} )* 
+}
+
+// void VardeclL():
+// {}
+// { 
+//   (<VAR> (<INT> | <FLOAT> | <BOOL> | <VOID>) <ID> <PONV>)*
+// }
+
+Vardecl Vardec() :
+{Token tipo; Token id;Vardecl v=null; Vardecl result=null;}
+{
+  ((tipo=<INT> id=<ID> <PONV> {result = new Vardecl(tipo.image, id.image);})
+  | (tipo=<FLOAT> id=<ID> <PONV> {result = new Vardecl(tipo.image, id.image);})
+  | (tipo=<BOOL> id=<ID> <PONV> {result = new Vardecl(tipo.image, id.image);})
+  | (tipo=<VOID> id=<ID> <PONV> {result = new Vardecl(tipo.image, id.image);}))
+  {return result;}
+}
+
+
+void Comandos(ArrayList comandos):
+{Comando c;}
+{
+  (c=Com() {comandos.add(c);})*
+}
+// void Comando():
+// {}
+// {
+//   <ID> ComandoL()
+//   | <IF> <APAR> Exp() <FPAR> <ACHAVES> Comandos() <FCHAVES> <PONV>
+//   | <WHILE> <APAR> Exp() <FPAR> <DO> <ACHAVES> Comandos() <FCHAVES> <PONV>
+//   | <DO> <ACHAVES> Comandos() <FCHAVES> <WHILE> <APAR> Exp() <FPAR> <PONV>
+//   | <RET> Exp() <PONV>
+//   | <PRINT> <APAR> Exp() <FPAR> <PONV>
+// }
+// void ComandoL():
+// {}
+// {
+//   <ATT> Exp() <PONV> 
+//   | <APAR> (ListaExp())? <FPAR> <PONV>
+// }
+
+Comando Com() :
+{Token id=null; Exp e=null; ArrayList comandos; Comando result=null;}
+{
+  ((id = <ID> <ATT> e=Exp() <PONV>{result = new Atrib(id.image,e);})
+  | (<IF> <APAR> e=Exp() <FPAR> <ACHAVES> {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> <PONV> {result = new If(e, comandos);})
+  | (<WHILE> <APAR> e=Exp() <FPAR> <DO> <ACHAVES> {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> <PONV> {result = new While(e, comandos);})
+  | (<DO> <ACHAVES> {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> <WHILE> <APAR> e=Exp() <FPAR>  <PONV> {result = new Do(e, comandos);})
+  | (<RET> e=Exp() <PONV> {result = new Return(e);})
+  | (<PRINT> <APAR> e=Exp() <FPAR> <PONV> {result = new Print(e);}))
+  {return result;}
+}
+// Comando ComL(Token id):
+// {Exp e=null;ArrayList exps;Comando result=null;}
+// {
+//   (<ATT> e=Exp() <PONV> {result = new Atrib(id.image,e);})
+//   | (<APAR> {exps = new ArrayList();} (ListaExp(exps))? <FPAR> <PONV> {result = new FuncCall(id.image, exps);})
+//   {return result;}
+// }
+
+Exp Exp():
+{Exp e1; Fator fat; Exp result=null;}
+{
+  ((<APAR> e1=Exp() {result = Exp1(e1);})
+  //  op=<OP> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  | (fat=Fat() {result = new ExpFator(fat);}))
+  {return result;}
+}
+
+Exp Exp1(Exp e1):
+{Token op;  Exp e2; Exp result=null;}
+{
+  
+  ((op=<MENOS> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<MAIS> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<VEZES> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<DIV> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<AND> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<OU> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<MENOR> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<MAIOR> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);})
+  |(op=<IGUAL> e2 = Exp() <FPAR>{result = new ExpOp(e1,e2,op.image);}))
+  {return result;}
+}
+
+Fator Fat():
+{Token id; ArrayList exps=null; Token t; Fator result=null;}
+{
+  ((id=<ID> result = FatorL(exps, id) { if(result == null) result = new FatorId(id.image);})
+  | (t=<NUM> {result = new FatorNum(t.image);})
+  | (t=<TRUE> {result = new FatorBool(Boolean.parseBoolean(t.image));})
+  | (t=<FALSE> {result = new FatorBool(Boolean.parseBoolean(t.image));}))
+  {return result;}
+}
+// CONTINUAR AQUI!
+Fator FatorL(ArrayList exps, Token id):
+{Fator result=null;}
+{
+  ((<APAR> {exps = new ArrayList();} (ListaExp(exps))? <FPAR>){result = new FatorIdList(exps,id.image);})?
+
+  {return result;}
+}
+
+void ListaExp(ArrayList exps):
+{Exp e;}
+{
+  (e=Exp() {exps.add(e);} ListaExpL(exps))
+}
+
+void ListaExpL(ArrayList exps):
+{Exp e;}
+{
+  (<VIR> e=Exp() {exps.add(e);} ListaExpL(exps))?
+}
+
+// void Func(ArrayList funcs):
+// {}
+// {
+//   (<FUNC> Func1(funcs))?
+// }
+
+void Funcs(ArrayList funcs):
+{Function f;}
+{
+  (<FUNC> f=Func() {funcs.add(f);})* 
+  // ((tipo=<INT> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> f = F(tipo, id, args, vardecls, comandos) {funcs.add(f);}) 
+  // | (tipo=<FLOAT> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> f = F(tipo, id, args, vardecls, comandos) {funcs.add(f);}) 
+  // | (tipo=<BOOL> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> f = F(tipo, id, args, vardecls, comandos) {funcs.add(f);}) 
+  // | (tipo=<VOID> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> f = F(tipo, id, args, vardecls, comandos) {funcs.add(f);}) )
+}
+
+Function Func():
+{Token tipo; Token id; ArrayList vardecls; ArrayList comandos; ArrayList args;Function result = null;}
+{
+  ((tipo=<INT> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> {result = new Function(tipo.image, id.image, args, vardecls, comandos);}) 
+  | (tipo=<FLOAT> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> {result = new Function(tipo.image, id.image, args, vardecls, comandos);}) 
+  | (tipo=<BOOL> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> {result = new Function(tipo.image, id.image, args, vardecls, comandos);}) 
+  | (tipo=<VOID> id=<ID> <APAR> {args = new ArrayList();} (ListaArg(args))? <ACHAVES> {vardecls = new ArrayList();} Vardecl(vardecls) {comandos = new ArrayList();} Comandos(comandos) <FCHAVES> {result = new Function(tipo.image, id.image, args, vardecls, comandos);}))
+  {return result;}
+  
+}
+
+void ListaArg(ArrayList args):
+{Arg a;}
+{
+  (a = Argm() {args.add(a);} (ListaArgL(args))*)
+  // tipo=<TIPO> id=<ID> ListaArgL()
+}
+
+Arg Argm() :
+{Token tipo; Token id; Arg result = null;}
+{
+  ((tipo=<INT> id=<ID> {result = new Arg(tipo.image, id.image);})
+  | (tipo=<FLOAT> id=<ID> {result = new Arg(tipo.image, id.image);})
+  | (tipo=<BOOL> id=<ID> {result = new Arg(tipo.image, id.image);})
+  | (tipo=<VOID> id=<ID> {result = new Arg(tipo.image, id.image);}))
+  {return result;}
+}
+
+void ListaArgL(ArrayList args):
+{Arg a;}
+{
+  (<VIR> a=Argm() {args.add(a);} ListaArgL(args))
+  | <FPAR>
+}
+

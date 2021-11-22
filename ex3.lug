@@ -1,0 +1,22 @@
+main {
+    var int valor;
+    var int iter;
+    var int cont;
+
+    iter := 6;
+    cont := 0;
+
+    while((cont < iter))
+    do {
+        valor := Fatorial(cont);
+        cont := (cont + 1);
+        print(valor);
+    };
+}
+
+function int Fatorial (int valor){
+    if((valor == 0)){
+        return 1;
+    };
+    return (valor * Fatorial((valor - 1)));
+}

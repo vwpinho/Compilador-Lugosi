@@ -1,0 +1,29 @@
+main {
+    var float valorAleatorio;
+    var float limite_superior;
+    var float limite_inferior;
+    var bool esta_contido;
+    var int cont;
+    var int n_vezes;
+
+    cont := 0;
+    n_vezes := 100;
+
+    limite_inferior := 35.50;
+    limite_superior := 60.45;
+
+    do{
+        valorAleatorio := 1.0;
+        esta_contido := Pertence_ao_Intervalo(valorAleatorio, limite_inferior, limite_superior);
+        if(esta_contido){
+            print(valorAleatorio);
+        };
+    }while((cont < n_vezes));
+}
+
+function bool Pertence_ao_Intervalo (float valor, float limite_inferior, float limite_superior){
+    if(((valor > (limite_inferior - 1)) || (valor < (limite_superior + 1)))){
+        return true;
+    };
+    return false;
+}

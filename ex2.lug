@@ -1,0 +1,11 @@
+main{
+    var int n1;
+    var int n2;
+    var int res;
+    n1 := 1;
+    n2 := 2;
+    res := soma(n1,n2);
+}
+function int soma(int n1, int n2){
+    return (n1 + n2);
+}

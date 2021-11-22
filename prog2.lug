@@ -1,0 +1,27 @@
+main{
+    var int count;
+    var bool res;
+    count := 0;
+    do{
+        print(count);
+        count := (count + 1);
+    }while((count < 10));
+
+    
+    res := Eh_igual(count, 10);
+    print(res);
+    res := Eh_menor(count,10);
+    print(res);
+}
+function bool Eh_igual(int num1, int num2){
+    if((num1 == num2)){
+        return true;
+    };
+    return false;
+}
+function bool Eh_menor(int num1, int num2){
+    if((num1 < num2)){
+        return true;
+    };
+    return false;
+}
